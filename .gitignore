@@ -1,4 +1,4 @@
-echo "venv/" >> .gitignore
-echo "__pycache__/" >> .gitignore
-echo "*.json" >> .gitignore
-echo "*.mp4" >> .gitignore
+venv/
+__pycache__/
+*.json
+*.mp4
