@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Study Guardian AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>✨ Study Room ✨</h1>
+            <p class="subtitle">stay focused, darling</p>
+        </header>
+
+        <div class="video-grid">
+            <div class="card">
+                <video id="charVideo" src="{{ url_for('static', filename='character.mp4') }}" autoplay loop muted></video>
+                <div class="label">Guardian</div>
+            </div>
+            
+            <div class="card">
+                <img id="ai-feed" src="{{ url_for('video_feed') }}">
+                <div class="label">You</div>
+            </div>
+        </div>
+
+        <div class="timer-section">
+            <div id="timer-display">30:00</div>
+            <button id="startBtn" onclick="startTimer()">Start Session</button>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 30 * 60;
+        let timerId = null;
+
+        function startTimer() {
+            if (timerId) return; // Prevent double start
+            
+            document.getElementById('startBtn').innerText = "Session Active";
+            document.getElementById('startBtn').style.opacity = "0.5";
+
+            timerId = setInterval(() => {
+                timeLeft--;
+                let mins = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                document.getElementById('timer-display').innerText = 
+                    `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    alert("Time is up! Good job.");
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
