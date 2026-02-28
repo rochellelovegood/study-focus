@@ -5,6 +5,7 @@ from vision import StudyDetector
 from ui_manager import StudyUI
 from engine import StudyEngine
 from modes import get_message
+from voice import speak
 
 class StudyGuardianController:
     def __init__(self):
@@ -34,6 +35,7 @@ class StudyGuardianController:
         
         # 7. Start AI & Video Update Loop
         self.update_loop()
+        speak("Hello Khin Than Thar")
 
     def start_session(self, duration_mins, xp_reward):
         """Triggered by duration buttons (25m, 30m, etc.)"""
