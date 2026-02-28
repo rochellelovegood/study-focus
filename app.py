@@ -50,9 +50,10 @@ def gen_frames():
                     eyes_lost_start = None
 
         # Voice Trigger
-        if status != "focus" and (now - last_alert) > 10:
-            speak(get_message("asian_mom", status))
+        if (now - last_alert) > 10:
+            speak(get_message("asian_mom", "YOU DUMB DUMB"))
             last_alert = now
+            print("DEBUG: Alert triggered for status:", status)
 
         # Encode for web
         ret, buffer = cv2.imencode('.jpg', frame)
@@ -67,6 +68,11 @@ def index():
 @app.route('/video_feed')
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/test_voice')
+def say_something():
+    
+    speak("Hello Khin Than Thar")
 
 if __name__ == '__main__':
     print("🚀 Server starting at http://127.0.0.1:5000")
