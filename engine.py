@@ -87,7 +87,7 @@ class StudyEngine:
     def handle_status(self, status, message_func=None):
         current_time = time.time()
 
-        # 1. Normalize (YOLO uses 'cell phone')
+       
         if status == "cell phone":
             status = "phone"
 
@@ -95,7 +95,7 @@ class StudyEngine:
         is_distracted = status in distracted_states
         
         # 2. Logic: Trigger if NEW distraction OR if same distraction persists past cooldown
-        # This ensures she yells immediately when she sees it, and every 10 seconds after.
+        
         new_distraction = is_distracted and (status != self.last_status)
         cooldown_passed = is_distracted and (current_time - self.last_voice_time >= self.voice_cooldown)
 
@@ -118,7 +118,7 @@ class StudyEngine:
                     msg = f"Stop being distracted by {status}!"
 
             # 3. THE TRIGGER (Check Mute)
-            # Ensure your UI switch is actually changing self.is_muted to False
+         
             print(f"[DEBUG] Status: {status} | Muted: {self.is_muted}") 
             
             if not self.is_muted:
@@ -178,10 +178,6 @@ class StudyEngine:
             except Exception as e:
                 print("Load error:", e)
 
-
-# =====================================
-# OPTIONAL TEST RUN
-# =====================================
 if __name__ == "__main__":
 
     def dummy_message(character, status):

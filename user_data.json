@@ -1,1 +1,1 @@
-{"xp": 0, "level": 2, "tasks": [{"text": "dff", "done": false}, {"text": "study python", "done": true}], "history": [{"date": "2026-02-24 18:29", "task": "study python", "duration": 25, "xp": 50}, {"date": "2026-02-24 18:29", "task": "study python", "duration": 25, "xp": 50}]}
+{"xp": 1, "level": 2, "tasks": [{"text": "dff", "done": false}, {"text": "study python", "done": true}], "history": [{"date": "2026-02-24 18:29", "task": "study python", "duration": 25, "xp": 50}, {"date": "2026-02-24 18:29", "task": "study python", "duration": 25, "xp": 50}]}
