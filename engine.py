@@ -30,8 +30,6 @@ class StudyEngine:
         # AI Status Tracking
         # -------------------------
         self.last_status = "focus"
-        self.last_warning_time = 0  # Track when last warning was sent
-        self.MIN_WARNING_INTERVAL = 30  # Minimum seconds between warnings
 
         # -------------------------
         # Voice System
@@ -43,7 +41,6 @@ class StudyEngine:
         self.start_voice_worker()
 
         print("✅ StudyEngine Initialized")
-        print("[UI] Asian Mom Warnings: ACTIVE")
 
     # --------------------------------
     # Voice Worker Thread
@@ -100,7 +97,7 @@ class StudyEngine:
             self.last_voice_time = current_time
 
     # --------------------------------
-    # AI Status Logic (FIXED VERSION)
+    # AI Status Logic
     # --------------------------------
     def handle_status(self, raw_status, message_func):
 
@@ -124,40 +121,32 @@ class StudyEngine:
         else:
             problem = "focus"
 
-        current_time = time.time()
-
         # -------------------------
-        # Check if status changed OR if we need to warn again (with cooldown)
+        # React only if status changed
         # -------------------------
         if problem != self.last_status:
-            
-            # Status changed
+
             if problem != "focus":
-                # User just went away - warn them
+
                 msg = message_func("asian_mom", problem)
+
                 print(f"📢 WARNING: {problem} -> {msg}")
+
                 self.trigger_voice(msg)
+
                 self.xp = max(0, self.xp - 5)
-                self.last_warning_time = current_time
+
             else:
-                # User came back
+
                 print("✅ User focused again")
 
             self.last_status = problem
 
-        elif problem != "focus":
-            # Status hasn't changed (still away), but check if we should warn again
-            if current_time - self.last_warning_time > self.MIN_WARNING_INTERVAL:
-                msg = message_func("asian_mom", problem)
-                print(f"📢 WARNING (reminder): {problem} -> {msg}")
-                self.trigger_voice(msg)
-                self.xp = max(0, self.xp - 5)
-                self.last_warning_time = current_time
-
         # -------------------------
-        # Reward focus (always, even if status hasn't changed)
+        # Reward focus
         # -------------------------
         if problem == "focus":
+
             self.xp += 1
 
     # --------------------------------
