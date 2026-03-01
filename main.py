@@ -33,7 +33,7 @@ class StudyGuardianController:
         if os.path.exists(self.partner_video_path):
             self.partner_cap = cv2.VideoCapture(self.partner_video_path)
         
-        self.engine.trigger_voice(f"Starting {duration_mins} minute session.")
+
         self.run_countdown()
 
     def run_countdown(self):
