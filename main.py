@@ -16,6 +16,8 @@ class StudyGuardianController:
         
         self.running = False
         self.timer_seconds = 0
+        self.current_session_mins = 0
+        self.current_session_xp = 0
         
         self.partner_video_path = "static/partner.mp4"
         self.partner_cap = None
@@ -29,11 +31,16 @@ class StudyGuardianController:
         """Immediately starts everything when a time button is clicked"""
         self.running = True
         self.timer_seconds = duration_mins * 60
+        self.current_session_mins = duration_mins
+        self.current_session_xp = xp_reward
         
         if os.path.exists(self.partner_video_path):
             self.partner_cap = cv2.VideoCapture(self.partner_video_path)
         
-
+        # Voice and cooldown reset
+        self.engine.trigger_voice(f"Starting {duration_mins} minute session. Let's focus!")
+        self.engine.last_voice_time = 0  # CRITICAL: Reset cooldown so first warning always fires
+        
         self.run_countdown()
 
     def run_countdown(self):
@@ -44,7 +51,7 @@ class StudyGuardianController:
                 self.ui.timer_label.configure(text=f"{mins:02d}:{secs:02d}")
             self.root.after(1000, self.run_countdown)
         elif self.timer_seconds <= 0:
-            self.stop_session()
+            self.complete_session()  # Changed from stop_session to complete_session
 
     def update_loop(self):
         # 1. Get AI status from camera
@@ -70,29 +77,34 @@ class StudyGuardianController:
         self.root.after(30, self.update_loop)
 
     def stop_session(self):
+        """Stop session early (user clicked stop)"""
         self.running = False
-        if self.partner_cap: self.partner_cap.release()
-        self.engine.trigger_voice("Session ended.")
+        if self.partner_cap: 
+            self.partner_cap.release()
+        self.engine.trigger_voice("Session ended early. Try again next time!")
+        self.ui.show_dashboard()
+
+    def complete_session(self):
+        """Timer hit 00:00 successfully - award XP"""
+        if self.running:
+            self.running = False
+            if self.partner_cap:
+                self.partner_cap.release()
+            
+            # Log the completed session to get XP
+            self.engine.log_session(self.current_session_mins, self.current_session_xp)
+            self.engine.trigger_voice("Congratulations! Session complete. Great job!")
+            self.ui.show_dashboard()
 
     def on_close(self):
         self.running = False
         self.engine.save_data()
         self.detector.cleanup()
+        if self.partner_cap:
+            self.partner_cap.release()
         self.root.destroy()
 
 
 if __name__ == "__main__":
     app = StudyGuardianController()
     app.root.mainloop()
-
-    def complete_session(self):
-        """Timer hit 00:00 successfully."""
-        if self.running:
-            self.running = False
-            if self.partner_cap:
-                self.partner_cap.release()
-            
-            # This calls the function we just added to engine.py
-            self.engine.log_session(self.current_session_mins, self.current_session_xp)
-            self.engine.trigger_voice("Congratulations! Session complete.")
-            self.ui.show_dashboard()
