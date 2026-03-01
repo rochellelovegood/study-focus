@@ -31,23 +31,29 @@ class StudyEngine:
 
     def start_voice_worker(self):
         def worker():
-            try:
-                engine = pyttsx3.init()
-                engine.setProperty('rate', 170)
-            except: return
+            print("🔊 Voice Worker Started")
             while True:
                 msg = self.voice_queue.get()
                 if msg is None: break
+                
                 try:
-                    engine.stop()
+                    # Initialize, speak, and stop IMMEDIATELY to release the driver
+                    engine = pyttsx3.init()
+                    engine.setProperty('rate', 170)
+                    print(f"🎙️ Engine Speaking: {msg}")
                     engine.say(msg)
                     engine.runAndWait()
-                except: pass
-                finally: self.voice_queue.task_done()
+                    engine.stop() # CRITICAL: Release the audio driver
+                    del engine    # Force cleanup
+                except Exception as e:
+                    print(f"❌ Voice Output Error: {e}")
+                finally:
+                    self.voice_queue.task_done()
         threading.Thread(target=worker, daemon=True).start()
 
     def trigger_voice(self, message):
         if not self.is_muted and message:
+            print(f"⬇️ Adding to Voice Queue: {message}")
             self.voice_queue.put(message)
 
     # --- THIS WAS THE MISSING METHOD ---

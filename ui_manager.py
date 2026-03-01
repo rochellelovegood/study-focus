@@ -72,7 +72,7 @@ class StudyUI:
         # Switch 'On' (True) means engine.is_muted = False
         # Switch 'Off' (False) means engine.is_muted = True
         is_active = self.mute_var.get()
-        self.ctrl.engine.is_muted = not is_active
+        # self.ctrl.engine.is_muted = not is_active
         state = "ACTIVE" if is_active else "MUTED"
         print(f"[UI] Asian Mom Warnings: {state}")
 

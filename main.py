@@ -34,6 +34,7 @@ class StudyGuardianController:
             self.partner_cap = cv2.VideoCapture(self.partner_video_path)
         
         self.engine.trigger_voice(f"Starting {duration_mins} minute session.")
+        self.engine.last_voice_time = 0  # CRITICAL: Reset cooldown so first warning always fires
         self.run_countdown()
 
     def run_countdown(self):
