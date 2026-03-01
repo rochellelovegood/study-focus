@@ -46,57 +46,46 @@ class StudyEngine:
         print("[UI] Asian Mom Warnings: ACTIVE")
 
     # --------------------------------
-    # Voice Worker Thread
+    # Voice Worker Thread (RESOLVED)
     # --------------------------------
     def start_voice_worker(self):
 
         def worker():
-
-            try:
-                engine = pyttsx3.init()
-                engine.setProperty("rate", 170)
-            except Exception as e:
-                print("Voice engine failed:", e)
-                return
-
+            print("🔊 Voice Worker Started")
             while True:
-
-                message = self.voice_queue.get()
-
-                if message is None:
+                msg = self.voice_queue.get()
+                if msg is None: 
                     break
-
+                
                 try:
-                    engine.say(message)
+                    # Initialize engine for each message to avoid driver issues
+                    engine = pyttsx3.init()
+                    engine.setProperty('rate', 170)
+                    print(f"🎙️ Engine Speaking: {msg}")
+                    engine.say(msg)
                     engine.runAndWait()
-
+                    engine.stop()  # CRITICAL: Release the audio driver
                 except Exception as e:
-                    print("Voice error:", e)
-
+                    print(f"❌ Voice Output Error: {e}")
                 finally:
                     self.voice_queue.task_done()
 
         threading.Thread(target=worker, daemon=True).start()
 
     # --------------------------------
-    # Trigger Voice Safely
+    # Trigger Voice Safely (RESOLVED)
     # --------------------------------
     def trigger_voice(self, message):
 
-        if self.is_muted:
-            return
-
-        if not message:
+        if self.is_muted or not message:
             return
 
         current_time = time.time()
 
         if current_time - self.last_voice_time > self.voice_cooldown:
-
-            print("🔊 Speaking:", message)
-
+            print(f"🔊 Speaking: {message}")
+            print(f"⬇️ Adding to Voice Queue: {message}")
             self.voice_queue.put(message)
-
             self.last_voice_time = current_time
 
     # --------------------------------
