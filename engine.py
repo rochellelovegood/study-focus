@@ -51,7 +51,8 @@ class StudyEngine:
             print("🔊 Voice Worker Started")
             while True:
                 msg = self.voice_queue.get()
-                if msg is None: 
+                if msg is None:
+                    print("👋 Voice Worker Stopping")
                     break
                 
                 try:
@@ -62,12 +63,13 @@ class StudyEngine:
                     engine.say(msg)
                     engine.runAndWait()
                     engine.stop()  # CRITICAL: Release the audio driver
+                    del engine  # Ensure cleanup
                 except Exception as e:
                     print(f"❌ Voice Output Error: {e}")
                 finally:
                     self.voice_queue.task_done()
 
-        threading.Thread(target=worker, daemon=True).start()
+        threading.Thread(target=worker).start()
 
     # --------------------------------
     # Trigger Voice Safely (RESOLVED)
@@ -172,3 +174,21 @@ class StudyEngine:
     def save_data(self):
 
         print(f"💾 Data Saved. Current XP: {self.xp}")
+
+    def shutdown(self):
+        """Clean shutdown of the voice system"""
+        self.voice_queue.put(None)  # Signal the worker to stop
+        time.sleep(1)  # Give it time to process
+
+
+if __name__ == "__main__":
+    engine = StudyEngine()
+    print("StudyEngine is running. Press Ctrl+C to exit.")
+    try:
+        while True:
+            time.sleep(1)
+            engine.trigger_voice("This is a test message to keep the voice worker alive.")
+    except KeyboardInterrupt:
+        print("\nExiting StudyEngine.")
+        engine.shutdown()
+        

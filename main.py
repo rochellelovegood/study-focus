@@ -103,6 +103,7 @@ class StudyGuardianController:
         if self.partner_cap:
             self.partner_cap.release()
         self.root.destroy()
+        self.engine.shutdown()
 
 
 if __name__ == "__main__":
